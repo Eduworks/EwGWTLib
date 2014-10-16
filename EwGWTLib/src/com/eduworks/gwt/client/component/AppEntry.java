@@ -27,7 +27,7 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
    protected static final String DEFAULT_INSTALLATION_SETTINGS_LOC = "../js/installation.settings";
    protected static final String DEFAULT_MODULE_PROPERTIES_LOC = "../js/module.properties";
 
-   private static String parseProperty(String prop) {
+   protected static String parseProperty(String prop) {
       return prop.substring(prop.indexOf("\"") + 1, prop.lastIndexOf("\""));
    }
    
