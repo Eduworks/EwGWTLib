@@ -71,19 +71,7 @@ public class ESBApi {
 								  		   callback);
 	}
 	
-	public static String createUser(String username, String password, ESBCallback<ESBPacket> callback) {
-      MultipartPost mp = new MultipartPost();
-      ESBPacket jo = new ESBPacket();
-      jo.put("username", username);
-      jo.put("password", password);
-      mp.appendMultipartFormData("session", jo);
-      return CommunicationHub.sendMultipartPost(getESBActionURL("createUser"),
-                                 mp, 
-                                 false, 
-                                 callback);
-   }
-	
-	public static String getUser(ESBCallback<ESBPacket> callback) {
+	public static String getUser(String username, ESBCallback<ESBPacket> callback) {
       MultipartPost mp = new MultipartPost();
       ESBPacket jo = new ESBPacket();
       jo.put("username", username);
@@ -386,4 +374,78 @@ public class ESBApi {
                                  callback);
 	}
 	
+	public static String getUserListing(ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("userListing"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String addUserPermissions(String username, String permissionId, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("username", username);
+		jo.put("permissionId", permissionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("addUserPermission"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+
+	public static String removeUserPermissions(String username, String permissionId, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("username", username);
+		jo.put("permissionId", permissionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("removeUserPermission"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String resetUserPassword(String username, String password, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("username", username);
+		jo.put("password", password);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("userPasswordReset"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String createUser(String username, String password, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("username", username);
+		jo.put("password", password);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("createUser"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+
+	public static String deleteUser(String username, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("username", username);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("deleteUser"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
 }

@@ -460,9 +460,9 @@ public class PageAssembler
 			else if (typ==SUBMIT)
 				result = SubmitButton.wrap(e);
 			else if (typ==BUTTON)
-            result = Button.wrap(e);
+				result = Button.wrap(e);
 			else if (typ==CHECK_BOX)
-            result = SimpleCheckBox.wrap(e);
+				result = SimpleCheckBox.wrap(e);
 			DOM.sinkEvents(e, eventsSunk);
 			DOM.setEventListener(e, el);
 		} else {
