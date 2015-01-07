@@ -26,6 +26,7 @@ public abstract class FileRecord extends Record {
 	public final static String PART_OF = "partOf_t";
 	public final static String REQUIRES = "requires_t";
 	public final static String OWNER = "uploadedBy_t";
+	public final static String GROUPS = "sharedBy_t";
 	public final static String INTERACTIVITY = "interactivity_t";
 	public final static String LEVEL = "level_t";
 	public final static String KEYWORDS = "keywords_t";
@@ -45,7 +46,7 @@ public abstract class FileRecord extends Record {
 	public String getFieldList() {
 		return FILENAME + " " + DESCRIPTION + " " + MIMETYPE + " " + TITLE + " " + CREATED_BY + " " + PUBLISHER + " " + CLASSIFICATION + " " +
 			   ENVIRONMENT + " " + COVERAGE + " " + LANGUAGE + " " + TECHNICAL_REQUIREMENTS + " " + DISTRIBUTION + " " + VERSION + " " + THUMBNAIL + " " +
-			   PART_OF + " " + REQUIRES + " " + OWNER + " " + INTERACTIVITY + " " + LEVEL + " " + KEYWORDS + " " + OBJECTIVES + " " + FILE_CONTENT + " " +
+			   PART_OF + " " + REQUIRES + " " + OWNER + " "+ GROUPS + " " + INTERACTIVITY + " " + LEVEL + " " + KEYWORDS + " " + OBJECTIVES + " " + FILE_CONTENT + " " +
 			   FOUO + " " + SKILL + " " + VIEW + " " + DOWNLOADS + " " + FILESIZE_BYTES + " " + DURATION + " " + UPLOAD_DATE + " " + UPDATED_DATE;
 	}
 	
@@ -68,6 +69,7 @@ public abstract class FileRecord extends Record {
 	private String partOf = "";
 	private String requires = "";
 	private String owner = "";
+	private String groups = "";
 	private String interactivity = "";
 	private String level = "";
 	private String keywords = "";
@@ -134,6 +136,8 @@ public abstract class FileRecord extends Record {
 			requires = esbPacket.getString(REQUIRES);
 		if (esbPacket.containsKey(OWNER))
 			owner = esbPacket.getString(OWNER);
+		if (esbPacket.containsKey(GROUPS))
+			groups = esbPacket.getString(GROUPS);
 		if (esbPacket.containsKey(INTERACTIVITY))
 			interactivity = esbPacket.getString(INTERACTIVITY);
 		if (esbPacket.containsKey(LEVEL))
@@ -200,6 +204,14 @@ public abstract class FileRecord extends Record {
 		this.owner = owner;
 	}
 
+	public String getGroups() {
+		return groups;
+	}
+	
+	public void setGroups(String groups) {
+		this.groups = groups;
+	}
+	
 	public String getInteractivity() {
 		return interactivity;
 	}
@@ -502,6 +514,7 @@ public abstract class FileRecord extends Record {
 		esbPacket.put(PART_OF, partOf);
 		esbPacket.put(REQUIRES, requires);
 		esbPacket.put(OWNER, owner);
+		esbPacket.put(GROUPS, groups);
 		esbPacket.put(INTERACTIVITY, interactivity);
 		esbPacket.put(LEVEL, level);
 		esbPacket.put(KEYWORDS, keywords);
@@ -538,6 +551,7 @@ public abstract class FileRecord extends Record {
 		esbPacket.put(PART_OF, partOf);
 		esbPacket.put(REQUIRES, requires);
 		esbPacket.put(OWNER, owner);
+		esbPacket.put(GROUPS, groups);
 		esbPacket.put(INTERACTIVITY, interactivity);
 		esbPacket.put(LEVEL, level);
 		esbPacket.put(KEYWORDS, keywords);
