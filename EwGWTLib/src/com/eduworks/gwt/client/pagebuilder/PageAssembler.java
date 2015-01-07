@@ -230,6 +230,14 @@ public class PageAssembler
 				convertedIDs.add(e.getId());
 			} else if (e.getId()!="")
 				convertedIDs.add(e.getId());
+			
+			// Also update the "for" attribute so that checkbox and radio button labels will behave correctly
+			elementID = e.getAttribute("for");
+			if (elementID!=null)
+				indexOfToken = elementID.indexOf(token);
+			if (indexOfToken!=-1) {
+				e.setAttribute("for", elementID.substring(0, indexOfToken) + iDCounter + elementID.substring(indexOfToken + token.length()));
+			} 
 		}
 
 		if (incrementIDCounter) iDCounter++;
