@@ -71,6 +71,7 @@ public class ESBApi {
 								  		   callback);
 	}
 	
+	
 	public static String getUser(String username, ESBCallback<ESBPacket> callback) {
       MultipartPost mp = new MultipartPost();
       ESBPacket jo = new ESBPacket();
@@ -133,7 +134,7 @@ public class ESBApi {
       jo.put("permissionId", permissionId);
       jo.put("sessionId", sessionId);
       mp.appendMultipartFormData("session", jo);
-      return CommunicationHub.sendMultipartPost(getESBActionURL("userHasPermission"), 
+      return CommunicationHub.sendMultipartPost(getESBActionURL("checkUserPermission"), 
                                  mp, 
                                  false, 
                                  callback);
@@ -245,7 +246,17 @@ public class ESBApi {
 										   false, 
 										   callback);
 	}
-
+	
+	public static String compactCMS(ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("russel/compact"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
 	
 	//------------------------------------------------------
 	
@@ -385,6 +396,41 @@ public class ESBApi {
 				                                  callback);
 	}
 	
+	public static String createPermission(String permissionId, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("permissionId", permissionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("createPermission"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String deletePermission(String permissionId, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("permissionId", permissionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("deletePermission"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+
+	public static String getAllPermissions(ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("getAllPermissions"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+
 	public static String addUserPermissions(String username, String permissionId, ESBCallback<ESBPacket> callback) {
 		MultipartPost mp = new MultipartPost();
 	    ESBPacket jo = new ESBPacket();
@@ -410,7 +456,7 @@ public class ESBApi {
 				                                  false, 
 				                                  callback);
 	}
-	
+
 	public static String resetUserPassword(String username, String password, ESBCallback<ESBPacket> callback) {
 		MultipartPost mp = new MultipartPost();
 	    ESBPacket jo = new ESBPacket();
@@ -419,6 +465,18 @@ public class ESBApi {
 		jo.put("password", password);
 	    mp.appendMultipartFormData("session", jo);
 	    return CommunicationHub.sendMultipartPost(getESBActionURL("userPasswordReset"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+
+	public static String setUserEula(String username, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("username", username);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("userEulaSet"), 
 				                                  mp, 
 				                                  false, 
 				                                  callback);
@@ -444,6 +502,96 @@ public class ESBApi {
 		jo.put("username", username);
 	    mp.appendMultipartFormData("session", jo);
 	    return CommunicationHub.sendMultipartPost(getESBActionURL("deleteUser"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	
+	 public static String getGroup(String groupname, ESBCallback<ESBPacket> callback) {
+      MultipartPost mp = new MultipartPost();
+      ESBPacket jo = new ESBPacket();
+      jo.put("groupId", groupname);
+      jo.put("sessionId", sessionId);
+      mp.appendMultipartFormData("session", jo);
+      return CommunicationHub.sendMultipartPost(getESBActionURL("getGroupById"),
+                                 mp, 
+                                 false, 
+                                 callback);
+    }
+	
+	public static String getGroupListing(ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("getAllGroups"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String createGroup(String groupname, String groupdescription, String groupusers, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("groupId", groupname);
+		jo.put("description", groupdescription);
+		jo.put("users", groupusers);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("createGroup"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String deleteGroup(String groupname, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("groupId", groupname);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("deleteGroup"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String updateGroup(String groupId, String newName, String newDescription, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("groupId", groupId);
+		jo.put("name", newName);
+		jo.put("description", newDescription);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("updateGroup"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+
+	public static String addUserToGroup(String groupname, String username, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("groupId", groupname);
+		jo.put("username", username);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("addUserToGroup"), 
+				                                  mp, 
+				                                  false, 
+				                                  callback);
+	}
+	
+	public static String removeUserFromGroup(String groupname, String username, ESBCallback<ESBPacket> callback) {
+		MultipartPost mp = new MultipartPost();
+	    ESBPacket jo = new ESBPacket();
+        jo.put("sessionId", sessionId);
+		jo.put("groupId", groupname);
+		jo.put("username", username);
+	    mp.appendMultipartFormData("session", jo);
+	    return CommunicationHub.sendMultipartPost(getESBActionURL("removeUserFromGroup"), 
 				                                  mp, 
 				                                  false, 
 				                                  callback);
