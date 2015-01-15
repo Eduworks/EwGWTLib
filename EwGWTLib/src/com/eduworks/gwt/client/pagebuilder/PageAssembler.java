@@ -49,7 +49,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 
 public class PageAssembler
-{
+{ 
 	private static FlowPanel body = new FlowPanel();
 	private static ArrayList<Widget> contents = new ArrayList<Widget>();
 	private static long iDCounter;

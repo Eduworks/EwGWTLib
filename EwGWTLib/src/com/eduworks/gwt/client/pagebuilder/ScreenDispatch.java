@@ -19,7 +19,7 @@ package com.eduworks.gwt.client.pagebuilder;
 import java.util.Vector;
 
 import com.google.gwt.user.client.History;
-
+ 
 public class ScreenDispatch {
 	public static Vector<HistoryClosure> history = new Vector<HistoryClosure>();
 	private final int historyLimit = 30;
