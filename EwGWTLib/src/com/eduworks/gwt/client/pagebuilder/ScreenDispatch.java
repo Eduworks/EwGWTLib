@@ -21,7 +21,7 @@ import java.util.Vector;
 import com.google.gwt.user.client.History;
 
 public class ScreenDispatch {
-	public Vector<HistoryClosure> history = new Vector<HistoryClosure>();
+	public static Vector<HistoryClosure> history = new Vector<HistoryClosure>();
 	private final int historyLimit = 30;
 	private ScreenTemplate defaultScreen;
 	
@@ -53,6 +53,7 @@ public class ScreenDispatch {
 				if (history.get(x).screen!=null)
 					history.get(x).screen.display();
 				history.setSize(x+1);
+				History.newItem(token, false);
 				return;
 			}
 		}

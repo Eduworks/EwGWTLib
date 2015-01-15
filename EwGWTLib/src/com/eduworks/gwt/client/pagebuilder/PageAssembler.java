@@ -148,6 +148,10 @@ public class PageAssembler
 		return $wnd.$(elementClass);
 	}-*/;
 	
+	public static native Element[] getElementsBySelector(String selector) /*-{
+		return $wnd.$(selector).get();
+	}-*/;
+	
 	public static final native void runCustomJSHooks() /*-{
 		$wnd.boxedCustomAppJavascript();
 	}-*/;
