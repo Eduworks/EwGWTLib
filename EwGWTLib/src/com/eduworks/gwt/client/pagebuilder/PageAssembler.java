@@ -135,7 +135,7 @@ public class PageAssembler
 
 	public static final native void openPopup(String elementName) /*-{
 		if ($wnd.$('#' + elementName).trigger!=null)
-			$wnd.$('#' + elementName).reveal();
+			$wnd.$('#' + elementName).trigger('reveal:open');
 		if ($wnd.$('#' + elementName).foundation!=null)
 			$wnd.$('#' + elementName).foundation('reveal', 'open');
 	}-*/;
@@ -153,7 +153,8 @@ public class PageAssembler
 	}-*/;
 	
 	public static final native void runCustomJSHooks() /*-{
-		$wnd.boxedCustomAppJavascript();
+		if($wnd.boxedCustomAppJavascript != undefined)
+			$wnd.boxedCustomAppJavascript();
 	}-*/;
 	
 	public static void ready(Widget obj)
