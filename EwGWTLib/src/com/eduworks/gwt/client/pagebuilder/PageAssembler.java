@@ -388,7 +388,7 @@ public class PageAssembler
 			DOM.setEventListener(e, new EventListener() {
 										@Override
 										public void onBrowserEvent(Event event) {
-											if (event.getTypeInt()==eventTypes&&callback!=null)
+											if (callback!=null)
 												callback.onEvent(event);
 										}
 									});
