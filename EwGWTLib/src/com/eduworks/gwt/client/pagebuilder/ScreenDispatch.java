@@ -52,7 +52,7 @@ public class ScreenDispatch {
 			if (history.get(x).token.equals(token)) {
 				if (history.get(x).screen!=null)
 					history.get(x).screen.display();
-				history.setSize(x+1);
+				//history.setSize(x+1);
 				History.newItem(token, false);
 				return;
 			}
