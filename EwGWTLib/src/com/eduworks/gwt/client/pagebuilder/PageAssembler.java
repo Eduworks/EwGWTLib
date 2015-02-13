@@ -133,6 +133,13 @@ public class PageAssembler
 			$wnd.$('#' + elementName).foundation('reveal', 'close');
 	}-*/;
 
+	public static final native void openPopupOld(String elementName) /*-{
+		if ($wnd.$('#' + elementName).trigger!=null)
+			$wnd.$('#' + elementName).reveal();
+		if ($wnd.$('#' + elementName).foundation!=null)
+			$wnd.$('#' + elementName).foundation('reveal', 'open');
+	}-*/;
+	
 	public static final native void openPopup(String elementName) /*-{
 		if ($wnd.$('#' + elementName).trigger!=null)
 			$wnd.$('#' + elementName).trigger('reveal:open');
