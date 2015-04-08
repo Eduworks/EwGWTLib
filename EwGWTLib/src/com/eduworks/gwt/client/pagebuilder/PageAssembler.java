@@ -50,7 +50,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 
 public class PageAssembler
-{
+{ 
 	private static FlowPanel body = new FlowPanel();
 	private static ArrayList<Widget> contents = new ArrayList<Widget>();
 	private static long iDCounter;
@@ -135,15 +135,22 @@ public class PageAssembler
 			$wnd.$('#' + elementName).foundation('reveal', 'close');
 	}-*/;
 
-	//TB 1/21/2015 changed $wnd.$('#' + elementName).reveal();   to $wnd.$('#' + elementName).trigger('reveal:open');
-	public static final native void openPopup(String elementName) /*-{
-		if ($wnd.$('#' + elementName).reveal!=null)
-			$wnd.$('#' + elementName).reveal();
+	public static final native void openPopupOld(String elementName) /*-{
 		if ($wnd.$('#' + elementName).trigger!=null)
-			$wnd.$('#' + elementName).trigger('reveal:open');
+			$wnd.$('#' + elementName).reveal();
 		if ($wnd.$('#' + elementName).foundation!=null)
 			$wnd.$('#' + elementName).foundation('reveal', 'open');
 	}-*/;
+	
+	//TB 1/21/2015 changed $wnd.$('#' + elementName).reveal();   to $wnd.$('#' + elementName).trigger('reveal:open');
+   public static final native void openPopup(String elementName) /*-{
+      if ($wnd.$('#' + elementName).reveal!=null)
+         $wnd.$('#' + elementName).reveal();
+      if ($wnd.$('#' + elementName).trigger!=null)
+         $wnd.$('#' + elementName).trigger('reveal:open');
+      if ($wnd.$('#' + elementName).foundation!=null)
+         $wnd.$('#' + elementName).foundation('reveal', 'open');
+   }-*/;
 	
 	public static final native Element getElementByClass(String elementClass) /*-{
 		return $wnd.$(elementClass)[0];
@@ -153,8 +160,13 @@ public class PageAssembler
 		return $wnd.$(elementClass);
 	}-*/;
 	
+	public static native Element[] getElementsBySelector(String selector) /*-{
+		return $wnd.$(selector).get();
+	}-*/;
+	
 	public static final native void runCustomJSHooks() /*-{
-		$wnd.boxedCustomAppJavascript();
+		if($wnd.boxedCustomAppJavascript != undefined)
+			$wnd.boxedCustomAppJavascript();
 	}-*/;
 	
 	public static void ready(Widget obj)
@@ -235,6 +247,14 @@ public class PageAssembler
 				convertedIDs.add(e.getId());
 			} else if (e.getId()!="")
 				convertedIDs.add(e.getId());
+			
+			// Also update the "for" attribute so that checkbox and radio button labels will behave correctly
+			elementID = e.getAttribute("for");
+			if (elementID!=null)
+				indexOfToken = elementID.indexOf(token);
+			if (indexOfToken!=-1) {
+				e.setAttribute("for", elementID.substring(0, indexOfToken) + iDCounter + elementID.substring(indexOfToken + token.length()));
+			} 
 		}
 
 		if (incrementIDCounter) iDCounter++;
@@ -380,7 +400,7 @@ public class PageAssembler
 			DOM.setEventListener(e, new EventListener() {
 										@Override
 										public void onBrowserEvent(Event event) {
-											if (event.getTypeInt()==eventTypes&&callback!=null)
+											if (callback!=null)
 												callback.onEvent(event);
 										}
 									});
@@ -408,8 +428,7 @@ public class PageAssembler
 	
 	
 	/** @Returns if it worked */
-	public static native boolean attachHandler(String elementName, final String customEvent, final EventCallback callback) /*-{
-	   $wnd.$('#' + elementName).off(customEvent); 
+	public static native boolean attachHandler(String elementName, final String customEvent, final EventCallback callback) /*-{ 
 		$wnd.$('#' + elementName).on(customEvent, function (event) {
 			callback.@com.eduworks.gwt.client.net.callback.EventCallback::onEvent(Lcom/google/gwt/user/client/Event;)(event);
 		});
@@ -468,15 +487,15 @@ public class PageAssembler
 			else if (typ==SUBMIT)
 				result = SubmitButton.wrap(e);
 			else if (typ==BUTTON)
-            result = Button.wrap(e);
+				result = Button.wrap(e);
 			else if (typ==CHECK_BOX)
-            result = SimpleCheckBox.wrap(e);
+				result = SimpleCheckBox.wrap(e);
 			DOM.sinkEvents(e, eventsSunk);
 			DOM.setEventListener(e, el);
 		} else {
 			if (typ==TEXT)
 				 result = new TextBox();
-			if (typ==TEXT_AREA)
+			else if (typ==TEXT_AREA)
             result = new TextArea();
 			else if (typ==PASSWORD)
 				result = new PasswordTextBox();
