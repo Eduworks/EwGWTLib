@@ -44,18 +44,20 @@ import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimpleCheckBox;
 import com.google.gwt.user.client.ui.SubmitButton;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 
 public class PageAssembler
-{ 
+{
 	private static FlowPanel body = new FlowPanel();
 	private static ArrayList<Widget> contents = new ArrayList<Widget>();
 	private static long iDCounter;
 	private static String rootPanelName;
 	final public static String A = "a";
 	final public static String TEXT = "text";
+	final public static String TEXT_AREA = "textarea";
 	final public static String PASSWORD = "password";
 	final public static String LABEL = "label";
 	final public static String SELECT = "select";
@@ -133,13 +135,7 @@ public class PageAssembler
 			$wnd.$('#' + elementName).foundation('reveal', 'close');
 	}-*/;
 
-	public static final native void openPopupOld(String elementName) /*-{
-		if ($wnd.$('#' + elementName).trigger!=null)
-			$wnd.$('#' + elementName).reveal();
-		if ($wnd.$('#' + elementName).foundation!=null)
-			$wnd.$('#' + elementName).foundation('reveal', 'open');
-	}-*/;
-	
+	//TB 1/21/2015 changed $wnd.$('#' + elementName).reveal();   to $wnd.$('#' + elementName).trigger('reveal:open');
 	public static final native void openPopup(String elementName) /*-{
 		if ($wnd.$('#' + elementName).trigger!=null)
 			$wnd.$('#' + elementName).trigger('reveal:open');
@@ -155,13 +151,8 @@ public class PageAssembler
 		return $wnd.$(elementClass);
 	}-*/;
 	
-	public static native Element[] getElementsBySelector(String selector) /*-{
-		return $wnd.$(selector).get();
-	}-*/;
-	
 	public static final native void runCustomJSHooks() /*-{
-		if($wnd.boxedCustomAppJavascript != undefined)
-			$wnd.boxedCustomAppJavascript();
+		$wnd.boxedCustomAppJavascript();
 	}-*/;
 	
 	public static void ready(Widget obj)
@@ -242,14 +233,6 @@ public class PageAssembler
 				convertedIDs.add(e.getId());
 			} else if (e.getId()!="")
 				convertedIDs.add(e.getId());
-			
-			// Also update the "for" attribute so that checkbox and radio button labels will behave correctly
-			elementID = e.getAttribute("for");
-			if (elementID!=null)
-				indexOfToken = elementID.indexOf(token);
-			if (indexOfToken!=-1) {
-				e.setAttribute("for", elementID.substring(0, indexOfToken) + iDCounter + elementID.substring(indexOfToken + token.length()));
-			} 
 		}
 
 		if (incrementIDCounter) iDCounter++;
@@ -395,7 +378,7 @@ public class PageAssembler
 			DOM.setEventListener(e, new EventListener() {
 										@Override
 										public void onBrowserEvent(Event event) {
-											if (callback!=null)
+											if (event.getTypeInt()==eventTypes&&callback!=null)
 												callback.onEvent(event);
 										}
 									});
@@ -423,7 +406,8 @@ public class PageAssembler
 	
 	
 	/** @Returns if it worked */
-	public static native boolean attachHandler(String elementName, final String customEvent, final EventCallback callback) /*-{ 
+	public static native boolean attachHandler(String elementName, final String customEvent, final EventCallback callback) /*-{
+	   $wnd.$('#' + elementName).off(customEvent); 
 		$wnd.$('#' + elementName).on(customEvent, function (event) {
 			callback.@com.eduworks.gwt.client.net.callback.EventCallback::onEvent(Lcom/google/gwt/user/client/Event;)(event);
 		});
@@ -459,6 +443,8 @@ public class PageAssembler
 			EventListener el = DOM.getEventListener(e);
 			if (typ==TEXT)
 				 result = TextBox.wrap(e);
+			else if (typ==TEXT_AREA)
+            result = TextArea.wrap(e);
 			else if (typ==PASSWORD)
 				result = PasswordTextBox.wrap(e);
 			else if (typ==LABEL)
@@ -480,14 +466,16 @@ public class PageAssembler
 			else if (typ==SUBMIT)
 				result = SubmitButton.wrap(e);
 			else if (typ==BUTTON)
-				result = Button.wrap(e);
+            result = Button.wrap(e);
 			else if (typ==CHECK_BOX)
-				result = SimpleCheckBox.wrap(e);
+            result = SimpleCheckBox.wrap(e);
 			DOM.sinkEvents(e, eventsSunk);
 			DOM.setEventListener(e, el);
 		} else {
 			if (typ==TEXT)
 				 result = new TextBox();
+			if (typ==TEXT_AREA)
+            result = new TextArea();
 			else if (typ==PASSWORD)
 				result = new PasswordTextBox();
 			else if (typ==LABEL)
@@ -525,6 +513,8 @@ public class PageAssembler
 			EventListener el = DOM.getEventListener(e);
 			if (typ==TEXT)
 				 result = TextBox.wrap(e);
+			else if (typ==TEXT_AREA)
+            result = TextArea.wrap(e);
 			else if (typ==PASSWORD)
 				result = PasswordTextBox.wrap(e);
 			else if (typ==LABEL)
@@ -554,6 +544,8 @@ public class PageAssembler
 		} else {
 			if (typ==TEXT)
 				 result = new TextBox();
+			else if (typ==TEXT_AREA)
+            result = new TextArea();
 			else if (typ==PASSWORD)
 				result = new PasswordTextBox();
 			else if (typ==LABEL)
