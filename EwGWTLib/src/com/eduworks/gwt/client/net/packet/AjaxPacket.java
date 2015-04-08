@@ -133,7 +133,10 @@ public abstract class AjaxPacket extends JSONObject {
 	}
 	
 	public native void remove(String key) /*-{
-		delete this[key];
+		if (this['jsObject']!=null)
+			delete this['jsObject'][key];
+		else
+			delete this[key];
 	}-*/;
 	
 	public final native static JavaScriptObject parseJSON(String x) /*-{ 

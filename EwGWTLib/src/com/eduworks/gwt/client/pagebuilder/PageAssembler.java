@@ -137,6 +137,8 @@ public class PageAssembler
 
 	//TB 1/21/2015 changed $wnd.$('#' + elementName).reveal();   to $wnd.$('#' + elementName).trigger('reveal:open');
 	public static final native void openPopup(String elementName) /*-{
+		if ($wnd.$('#' + elementName).reveal!=null)
+			$wnd.$('#' + elementName).reveal();
 		if ($wnd.$('#' + elementName).trigger!=null)
 			$wnd.$('#' + elementName).trigger('reveal:open');
 		if ($wnd.$('#' + elementName).foundation!=null)
