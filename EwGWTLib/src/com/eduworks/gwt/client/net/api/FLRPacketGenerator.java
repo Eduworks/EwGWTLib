@@ -41,6 +41,7 @@ public class FLRPacketGenerator {
    private static final String FLR_PL_SCHEMA_LOC_KEY = "payload_schema_locator";
    private static final String FLR_RESOURCE_DATA_KEY = "resource_data";
    private static final String FLR_REPLACES_KEY = "replaces";
+   private static final String FLR_KEYWORDS_KEY = "keys";
 
    private static final String FLR_DOC_TYPE_VALUE = "resource_data";
    private static final String FLR_DOC_VERSION_VALUE = "0.49.0";
@@ -85,11 +86,10 @@ public class FLRPacketGenerator {
    // private static final String PD_ISD_ACTION_VALUE = "aligned";
    private static final String PD_CONTEXT_VALUE = "ADL RUSSEL repository";
 
-   // should these be constant??
-   private static final String FLR_SUBMITTER_VALUE = "ADL RUSSEL";
-   private static final String FLR_CURATOR_VALUE = "ADL RUSSEL";
-   private static final String FLR_PUB_NODE_VALUE = "RUSSEL";
-   private static final String PD_ACTOR_DESC_VALUE = "ADL RUSSEL user community";
+   private static final String DEFAULT_FLR_SUBMITTER_VALUE = "ADL RUSSEL";
+   private static final String DEFAULT_FLR_CURATOR_VALUE = "ADL RUSSEL";
+   private static final String DEFAULT_FLR_PUB_NODE_VALUE = "RUSSEL";
+   private static final String DEFAULT_PD_ACTOR_VALUE = "ADL RUSSEL user community";
 
    private static final String NSDL_DC_HEADER_TAG = "<nsdl_dc:nsdl_dc xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
          + " xmlns:dc=\"http://purl.org/dc/elements/1.1/\""
@@ -128,7 +128,7 @@ public class FLRPacketGenerator {
    private static String buildNsdlDcXml(FLRRecord flrRec) {
       StringBuffer nsdl = new StringBuffer();
       nsdl.append(NSDL_DC_HEADER_TAG);
-      nsdl.append("<dc:identifier xsi:type=\"dct:URI\">" + CommunicationHub.siteURL + "?id=" + flrRec.getGuid() + "</dc:identifier>");
+      nsdl.append("<dc:identifier xsi:type=\"dct:URI\">" + getResourceUrl(flrRec) + "?id=" + flrRec.getGuid() + "</dc:identifier>");
       nsdl.append(createDcEntry("title", flrRec.getTitle()));
       nsdl.append(createDcEntry("description", flrRec.getDescription()));
       nsdl.append(createDcEntry("creator", flrRec.getPublisher()));
@@ -141,11 +141,11 @@ public class FLRPacketGenerator {
    }
 
    // generates an identity packet
-   private static ESBPacket getIdentityPacket(String publisher) {
+   private static ESBPacket getIdentityPacket(String publisher, String submitter, String curator) {
       ESBPacket identPacket = new ESBPacket();
       identPacket.put(FLR_SUBMITTER_TYPE_KEY, FLR_SUBMITTER_TYPE_VALUE);
-      identPacket.put(FLR_SUBMITTER_KEY, FLR_SUBMITTER_VALUE);
-      identPacket.put(FLR_CURATOR_KEY, FLR_CURATOR_VALUE);
+      identPacket.put(FLR_SUBMITTER_KEY, submitter);
+      identPacket.put(FLR_CURATOR_KEY, curator);
       identPacket.put(FLR_OWNER_KEY, publisher);
       return identPacket;
    }
@@ -159,8 +159,12 @@ public class FLRPacketGenerator {
 
    // returns the resource URL
    private static String getResourceUrl(FLRRecord flrRec) {
-      // TODO determine proper resource URL
-      return CommunicationHub.siteURL + "?id=" + flrRec.getGuid();
+      if (flrRec.getFlrResourceLocator() == null || flrRec.getFlrResourceLocator().trim().isEmpty()) {
+         return CommunicationHub.siteURL + "?id=" + flrRec.getGuid();
+      }
+      else {
+         return flrRec.getFlrResourceLocator();
+      }
    }
 
    // adds the appropriate FLR payload schema information
@@ -180,12 +184,12 @@ public class FLRPacketGenerator {
    }
 
    // generates some standard FLR packet info
-   private static void addFlrHeaderInfo(ESBPacket flrPacket, String payloadSchemaType, String resourceDataType, FLRRecord flrRec) {   	  
-	  flrPacket.put(FLR_DOC_TYPE_KEY, FLR_DOC_TYPE_VALUE);
+   private static void addFlrHeaderInfo(ESBPacket flrPacket, String payloadSchemaType, String resourceDataType, FLRRecord flrRec, String publishingNode, String submitter, String curator) {   	  
+      flrPacket.put(FLR_DOC_TYPE_KEY, FLR_DOC_TYPE_VALUE);
       flrPacket.put(FLR_DOC_VERSION_KEY, FLR_DOC_VERSION_VALUE);
       flrPacket.put(FLR_ACTIVE_KEY, FLR_ACTIVE_VALUE);
-      flrPacket.put(FLR_IDENTITY_KEY, getIdentityPacket(flrRec.getPublisher()));
-      flrPacket.put(FLR_PUB_NODE_KEY, FLR_PUB_NODE_VALUE);
+      flrPacket.put(FLR_IDENTITY_KEY, getIdentityPacket(flrRec.getPublisher(),submitter,curator));
+      flrPacket.put(FLR_PUB_NODE_KEY, publishingNode);
       flrPacket.put(FLR_RESOURCE_DATA_TYPE_KEY, resourceDataType);
       flrPacket.put(FLR_TOS_KEY, getTosPacket());
       if (NONE_SCHEMA.equalsIgnoreCase(payloadSchemaType)) {
@@ -195,6 +199,23 @@ public class FLRPacketGenerator {
     	  flrPacket.put(FLR_PL_PLACEMENT_KEY, FLR_PL_PLACEMENT_VALUE);
       }
       addFlrPayloadSchemaInfo(payloadSchemaType, flrPacket);
+   }
+   
+   // generates keyword list if needed
+   // this expects keywords to be in a comma separated string
+   private static void addFlrKeywords(ESBPacket flrPacket, FLRRecord flrRec) {
+      try {
+         if (flrRec.getKeywords() == null || flrRec.getKeywords().trim().isEmpty()) return;
+         String[] keys = flrRec.getKeywords().split(",");
+         JSONArray ja = new JSONArray();
+         int i = -1;
+         for (String key:keys) {
+            i++;
+            ja.set(i,new JSONString(key));
+         }
+         flrPacket.put(FLR_KEYWORDS_KEY, ja);
+      }
+      catch (Exception e){}
    }
 
    // adds a replaces key/value if the given flrRec already contains an FLR
@@ -216,17 +237,17 @@ public class FLRPacketGenerator {
    }
 
    // generates a paradata actor packet
-   private static ESBPacket getActorPacket() {
+   private static ESBPacket getActorPacket(String actor) {
       ESBPacket actorPacket = new ESBPacket();
       actorPacket.put(PD_OBJ_TYPE_KEY, PD_OBJ_TYPE_VALUE);
       JSONArray ja = new JSONArray();
-      ja.set(0, new JSONString(PD_ACTOR_DESC_VALUE));
+      ja.set(0, new JSONString(actor));
       actorPacket.put(PD_DESC_KEY, ja);
       return actorPacket;
    }
 
    // generates the ratings activity paradata packet
-   private static ESBPacket getRatingsActivityPacket(FLRRecord flrRec) {
+   private static ESBPacket getRatingsActivityPacket(FLRRecord flrRec, String actor) {
       int numRatings = (flrRec.getRatings() != null) ? flrRec.getRatings().keySet().size() : 0;
       String avgRating = NumberFormat.getFormat("#.##").format(flrRec.getRating());
       ESBPacket measurePacket = new ESBPacket();
@@ -241,9 +262,9 @@ public class FLRPacketGenerator {
       verbPacket.put(PD_CONTEXT_KEY, PD_CONTEXT_VALUE);
       verbPacket.put(PD_DATE_KEY, getParadataDateString(flrRec.getUploadDate()) + "/" + getParadataDateString(new Date()));
       ESBPacket ratingsActPacket = new ESBPacket();
-      ratingsActPacket.put(PD_ACTOR_KEY, getActorPacket());
+      ratingsActPacket.put(PD_ACTOR_KEY, getActorPacket(actor));
       ratingsActPacket.put(PD_VERB_KEY, verbPacket);
-      ratingsActPacket.put(PD_CONTENT_KEY, numRatings + " member(s) of the " + PD_ACTOR_DESC_VALUE + " gave '" + flrRec.getFilename() +
+      ratingsActPacket.put(PD_CONTENT_KEY, numRatings + " member(s) of the " + actor + " gave '" + flrRec.getFilename() +
                                            "' a rating of " + avgRating + " out of " + PD_SCALE_MAX_VALUE + " stars");
       ESBPacket retPacket = new ESBPacket();
       retPacket.put(PD_ACTIVITY_KEY, ratingsActPacket);
@@ -251,7 +272,7 @@ public class FLRPacketGenerator {
    }
 
    // generates the ratings activity paradata packet
-   private static ESBPacket getCommentsActivityPacket(FLRRecord flrRec) {
+   private static ESBPacket getCommentsActivityPacket(FLRRecord flrRec, String actor) {
       int numComments = (flrRec.getComments() != null) ? flrRec.getComments().keySet().size() : 0;
       ESBPacket measurePacket = new ESBPacket();
       measurePacket.put(PD_MEASURE_TYPE_KEY, PD_COUNT_MEASURE_TYPE_VALUE);
@@ -262,16 +283,16 @@ public class FLRPacketGenerator {
       verbPacket.put(PD_CONTEXT_KEY, PD_CONTEXT_VALUE);
       verbPacket.put(PD_DATE_KEY, getParadataDateString(flrRec.getUploadDate()) + "/" + getParadataDateString(new Date()));
       ESBPacket commentsActPacket = new ESBPacket();
-      commentsActPacket.put(PD_ACTOR_KEY, getActorPacket());
+      commentsActPacket.put(PD_ACTOR_KEY, getActorPacket(actor));
       commentsActPacket.put(PD_VERB_KEY, verbPacket);
-      commentsActPacket.put(PD_CONTENT_KEY, numComments + " member(s) of the " + PD_ACTOR_DESC_VALUE + " commented on '" + flrRec.getFilename() + "'");
+      commentsActPacket.put(PD_CONTENT_KEY, numComments + " member(s) of the " + actor + " commented on '" + flrRec.getFilename() + "'");
       ESBPacket retPacket = new ESBPacket();
       retPacket.put(PD_ACTIVITY_KEY, commentsActPacket);
       return retPacket;
    }
 
    @SuppressWarnings("unused")
-   private static ESBPacket getIsdActivityPacket(FLRRecord flrRec) {
+   private static ESBPacket getIsdActivityPacket(FLRRecord flrRec, String actor) {
       // TODO further define this
 
       // FLR API entry
@@ -300,7 +321,7 @@ public class FLRPacketGenerator {
       // }
 
       ESBPacket isdActPacket = new ESBPacket();
-      isdActPacket.put(PD_ACTOR_KEY, getActorPacket());
+      isdActPacket.put(PD_ACTOR_KEY, getActorPacket(actor));
 
       ESBPacket retPacket = new ESBPacket();
       retPacket.put(PD_ACTIVITY_KEY, isdActPacket);
@@ -308,10 +329,10 @@ public class FLRPacketGenerator {
    }
 
    //builds the paradata activity packet
-   private static ESBPacket buildActivityPacket(FLRRecord flrRec) {
+   private static ESBPacket buildActivityPacket(FLRRecord flrRec, String actor) {
       JSONArray actItemsArray = new JSONArray();
-      actItemsArray.set(0, getRatingsActivityPacket(flrRec));
-      actItemsArray.set(1, getCommentsActivityPacket(flrRec));
+      actItemsArray.set(0, getRatingsActivityPacket(flrRec, actor));
+      actItemsArray.set(1, getCommentsActivityPacket(flrRec, actor));
       // actItemsArray.set(2,getIsdActivityPacket(flrRec));
       ESBPacket itemsPacket = new ESBPacket();
       itemsPacket.put(PD_ITEMS_KEY, actItemsArray);
@@ -325,16 +346,48 @@ public class FLRPacketGenerator {
     * Builds and returns an FLR record metadata/description (NSDL Dublin Core) packet for the given FLRRecord.
     * 
     * @param flrRec The FLRRecord to base the packet on.
+    * @param publishingNode The publishing node value.
+    * @param submitter The submitter value.
+    * @param curator The curator to value.
     * @return Returns an FLR record metadata/description (NSDL Dublin Core) packet for the given FLRRecord.
     */
-   public static ESBPacket buildFlrNsdlPacket(FLRRecord flrRec) {
+   public static ESBPacket buildFlrNsdlPacket(FLRRecord flrRec, String publishingNode, String submitter, String curator) {
       ESBPacket retPacket = new ESBPacket();
-      addFlrHeaderInfo(retPacket, NSDL_SCHEMA, FLR_RESOURCE_DATA_TYPE_METADATA_VALUE, flrRec);
+      addFlrHeaderInfo(retPacket, NSDL_SCHEMA, FLR_RESOURCE_DATA_TYPE_METADATA_VALUE, flrRec, publishingNode, submitter, curator);
+      addFlrKeywords(retPacket,flrRec);
       retPacket.put(FLR_RESOURCE_DATA_KEY, buildNsdlDcXml(flrRec));
       addFlrReplaces(retPacket, flrRec, FLR_RESOURCE_DATA_TYPE_METADATA_VALUE);
       return retPacket;
    }
+   
+   /**
+    * Builds and returns an FLR record metadata/description (NSDL Dublin Core) packet for the given FLRRecord.
+    * 
+    * @param flrRec The FLRRecord to base the packet on.
+    * @return Returns an FLR record metadata/description (NSDL Dublin Core) packet for the given FLRRecord.
+    */
+   public static ESBPacket buildFlrNsdlPacket(FLRRecord flrRec) {     
+      return buildFlrNsdlPacket(flrRec,DEFAULT_FLR_PUB_NODE_VALUE,DEFAULT_FLR_SUBMITTER_VALUE,DEFAULT_FLR_CURATOR_VALUE);
+   }
 
+   /**
+    * Builds and returns an FLR record paradata packet for the given FLRRecord.
+    * 
+    * @param flrRec The FLRRecord to base the packet on.
+    * @param publishingNode The publishing node value.
+    * @param submitter The submitter value.
+    * @param curator The curator to value.
+    * @param actor The actor value
+    * @return Returns an FLR record paradata packet for the given FLRRecord.
+    */
+   public static ESBPacket buildFlrParadataPacket(FLRRecord flrRec, String publishingNode, String submitter, String curator, String actor) {
+      ESBPacket retPacket = new ESBPacket();
+      addFlrHeaderInfo(retPacket, PARADATA_SCHEMA, FLR_RESOURCE_DATA_TYPE_PARADATA_VALUE, flrRec, publishingNode, submitter, curator);
+      retPacket.put(FLR_RESOURCE_DATA_KEY, buildActivityPacket(flrRec, actor));
+      addFlrReplaces(retPacket, flrRec, FLR_RESOURCE_DATA_TYPE_PARADATA_VALUE);
+      return retPacket;
+   }
+   
    /**
     * Builds and returns an FLR record paradata packet for the given FLRRecord.
     * 
@@ -342,11 +395,23 @@ public class FLRPacketGenerator {
     * @return Returns an FLR record paradata packet for the given FLRRecord.
     */
    public static ESBPacket buildFlrParadataPacket(FLRRecord flrRec) {
-      ESBPacket retPacket = new ESBPacket();
-      addFlrHeaderInfo(retPacket, PARADATA_SCHEMA, FLR_RESOURCE_DATA_TYPE_PARADATA_VALUE, flrRec);
-      retPacket.put(FLR_RESOURCE_DATA_KEY, buildActivityPacket(flrRec));
-      addFlrReplaces(retPacket, flrRec, FLR_RESOURCE_DATA_TYPE_PARADATA_VALUE);
-      return retPacket;
+      return buildFlrParadataPacket(flrRec,DEFAULT_FLR_PUB_NODE_VALUE,DEFAULT_FLR_SUBMITTER_VALUE,DEFAULT_FLR_CURATOR_VALUE,DEFAULT_PD_ACTOR_VALUE);
+   }
+   
+   /**
+    * Builds and returns an FLR record delete metadata packet for the given FLRRecord.
+    * 
+    * @param flrRec The FLRRecord to base the packet on.
+    * @param publishingNode The publishing node value.
+    * @param submitter The submitter value.
+    * @param curator The curator to value.
+    * @return Returns an FLR record paradata packet for the given FLRRecord.
+    */
+   public static ESBPacket buildFlrDeleteNsdlPacket(FLRRecord flrRec, String publishingNode, String submitter, String curator) {
+	   ESBPacket retPacket = new ESBPacket();
+	   addFlrHeaderInfo(retPacket, NONE_SCHEMA, FLR_RESOURCE_DATA_TYPE_DELETE_VALUE, flrRec, publishingNode, submitter, curator);
+	   addFlrReplaces(retPacket, flrRec, FLR_RESOURCE_DATA_TYPE_METADATA_VALUE);
+	   return retPacket;
    }
    
    /**
@@ -356,9 +421,22 @@ public class FLRPacketGenerator {
     * @return Returns an FLR record paradata packet for the given FLRRecord.
     */
    public static ESBPacket buildFlrDeleteNsdlPacket(FLRRecord flrRec) {
+     return buildFlrDeleteNsdlPacket(flrRec,DEFAULT_FLR_PUB_NODE_VALUE,DEFAULT_FLR_SUBMITTER_VALUE,DEFAULT_FLR_CURATOR_VALUE);
+   }
+   
+   /**
+    * Builds and returns an FLR record delete paradata packet for the given FLRRecord.
+    * 
+    * @param flrRec The FLRRecord to base the packet on.
+    * @param publishingNode The publishing node value.
+    * @param submitter The submitter value.
+    * @param curator The curator to value.
+    * @return Returns an FLR record paradata packet for the given FLRRecord.
+    */
+   public static ESBPacket buildFlrDeleteParadataPacket(FLRRecord flrRec, String publishingNode, String submitter, String curator) {
 	   ESBPacket retPacket = new ESBPacket();
-	   addFlrHeaderInfo(retPacket, NONE_SCHEMA, FLR_RESOURCE_DATA_TYPE_DELETE_VALUE, flrRec);
-	   addFlrReplaces(retPacket, flrRec, FLR_RESOURCE_DATA_TYPE_METADATA_VALUE);
+	   addFlrHeaderInfo(retPacket, NONE_SCHEMA, FLR_RESOURCE_DATA_TYPE_DELETE_VALUE, flrRec, publishingNode, submitter, curator);
+	   addFlrReplaces(retPacket, flrRec, FLR_RESOURCE_DATA_TYPE_PARADATA_VALUE);
 	   return retPacket;
    }
    
@@ -369,9 +447,6 @@ public class FLRPacketGenerator {
     * @return Returns an FLR record paradata packet for the given FLRRecord.
     */
    public static ESBPacket buildFlrDeleteParadataPacket(FLRRecord flrRec) {
-	   ESBPacket retPacket = new ESBPacket();
-	   addFlrHeaderInfo(retPacket, NONE_SCHEMA, FLR_RESOURCE_DATA_TYPE_DELETE_VALUE, flrRec);
-	   addFlrReplaces(retPacket, flrRec, FLR_RESOURCE_DATA_TYPE_PARADATA_VALUE);
-	   return retPacket;
+      return buildFlrDeleteParadataPacket(flrRec,DEFAULT_FLR_PUB_NODE_VALUE,DEFAULT_FLR_SUBMITTER_VALUE,DEFAULT_FLR_CURATOR_VALUE);
    }
 }
