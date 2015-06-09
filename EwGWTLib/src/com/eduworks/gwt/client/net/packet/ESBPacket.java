@@ -89,6 +89,19 @@ public class ESBPacket extends AjaxPacket{
 		newWindow=window.open(uriContent, filename);
 	}-*/;
 	
+	public final native String getFileDownloadUri(String filename, String mimetype)/*-{
+      var binary = '';
+      var buffer = this.contentStream;
+      var bytes = new Uint8Array(buffer);
+      
+      for (var i = 0, l = bytes.byteLength; i < l; i++) {
+       binary += String.fromCharCode(bytes[i]);
+      }
+      
+      return "data:"+mimetype+";filename="+filename+";base64," + window.btoa(binary);
+      //newWindow=window.open(uriContent, filename);
+   }-*/;
+	
 	public final String getContentString() { 
 		return this.getString("contentStream");
 	}
