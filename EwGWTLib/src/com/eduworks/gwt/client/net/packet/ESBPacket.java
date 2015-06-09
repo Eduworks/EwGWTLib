@@ -93,6 +93,8 @@ public class ESBPacket extends AjaxPacket{
 		a.style.display='none';
 		document.body.appendChild(a);
 		a.click();
+		document.body.removeChild(a);
+		
 	}-*/;
 	
 	public final native String getFileDownloadUri(String filename, String mimetype)/*-{
@@ -104,8 +106,7 @@ public class ESBPacket extends AjaxPacket{
        binary += String.fromCharCode(bytes[i]);
       }
       
-      return "data:"+mimetype+";filename="+filename+";base64," + window.btoa(binary);
-      //newWindow=window.open(uriContent, filename);
+      return "data:"+mimetype+";filename="+filename+";base64," + window.btoa(binary);      
    }-*/;
 	
 	public final String getContentString() { 
