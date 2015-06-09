@@ -85,8 +85,14 @@ public class ESBPacket extends AjaxPacket{
 		 binary += String.fromCharCode(bytes[i]);
 		}
 		
-		uriContent = "data:"+mimetype+";filename="+filename+";base64," + window.btoa(binary);
-		newWindow=window.open(uriContent, filename);
+		uriContent = "data:"+mimetype+";base64," + window.btoa(binary);
+		
+		var a = document.createElement('a');
+		a.setAttribute('download',filename);
+		a.href=uriContent;
+		a.style.display='none';
+		document.body.appendChild(a);
+		a.click();
 	}-*/;
 	
 	public final native String getFileDownloadUri(String filename, String mimetype)/*-{
