@@ -28,7 +28,22 @@ public class ESBApi {
 	public static String username;
 	public static String sessionId = null;
 	public static String esbURL = "api/custom/";
-		
+	
+	public static void setSessionId(String id){
+		sessionId = id;
+		storeSessionId(sessionId);
+	}
+	
+	public static native void storeSessionId(String id) /*-{
+		$wnd.localStorage.setItem("decalsSessionId",id);
+	}-*/;
+	
+	public static native String getStoredSessionId() /*-{
+		return $wnd.localStorage.getItem("decalsSessionId");
+	}-*/;
+	
+	
+	
 	public static String getESBActionURL(String action) {
 		return CommunicationHub.esbURL + action;
 	}
