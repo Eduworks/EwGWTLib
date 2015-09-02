@@ -47,7 +47,7 @@ public class MultipartPost
 	/* INSTANCE MEMBERS */
 	public MultipartPost()
 	{
-		if (Browser.isIE()) {
+		if (Browser.isBadIE()) {
 			payload = "";
 		} else {
 			payloadHandle = getFormData();
@@ -81,7 +81,7 @@ public class MultipartPost
 	 */
 	public void appendMultipartFormData(final String fieldName, final JSONValue data)
 	{
-		if (Browser.isIE()) {
+		if (Browser.isBadIE()) {
 			final StringBuilder body = new StringBuilder();
 	
 			if (payload != null && payload != "") body.append(payload);
@@ -108,7 +108,7 @@ public class MultipartPost
 	 */
 	public void appendMultipartFormData(final String fieldName, final String data)
 	{
-		if (Browser.isIE()) {
+		if (Browser.isBadIE()) {
 			final StringBuilder body = new StringBuilder();
 	
 			if (payload != null && payload != "") body.append(payload);
