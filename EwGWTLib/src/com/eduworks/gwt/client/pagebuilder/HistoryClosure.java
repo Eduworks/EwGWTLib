@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.eduworks.gwt.client.pagebuilder;
 
+import com.eduworks.gwt.client.pagebuilder.screen.ScreenTemplate;
+
 public class HistoryClosure {
 	public ScreenTemplate screen;
 	public String token;

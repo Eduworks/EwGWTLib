@@ -14,10 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.eduworks.gwt.client.pagebuilder;
+package com.eduworks.gwt.client.pagebuilder.screen;
 
 import java.util.Vector;
 
+import com.eduworks.gwt.client.pagebuilder.HistoryClosure;
 import com.google.gwt.user.client.History;
  
 public class ScreenDispatch {

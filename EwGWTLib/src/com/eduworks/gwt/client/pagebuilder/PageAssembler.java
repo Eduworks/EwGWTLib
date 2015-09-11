@@ -22,6 +22,7 @@ import java.util.Vector;
 import org.w3c.dom.Node;
 
 import com.eduworks.gwt.client.net.callback.EventCallback;
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Document;
@@ -620,4 +621,11 @@ public class PageAssembler
 		if (elementById != null)
 			elementById.addClassName(classToAdd);
 	}
+	
+	
+	public static native void onReady(Callback cb)/*-{
+		$wnd.$($doc).ready(function(){
+			cb.@com.google.gwt.core.client.Callback::onSuccess(Ljava/lang/Object;)(undefined);
+		});
+	}-*/;
 }
