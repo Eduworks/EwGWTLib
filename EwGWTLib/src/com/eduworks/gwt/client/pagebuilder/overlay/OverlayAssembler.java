@@ -3,20 +3,29 @@ package com.eduworks.gwt.client.pagebuilder.overlay;
 import java.util.ArrayList;
 
 import com.eduworks.gwt.client.component.Constants;
+import com.eduworks.gwt.client.net.callback.EventCallback;
 import com.eduworks.gwt.client.pagebuilder.PageAssembler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class OverlayAssembler extends PageAssembler{
+public class OverlayAssembler {
 	protected static FlowPanel overlayBody = new FlowPanel();
+	
 	protected static String overlayPanelName;
+	protected static String CLOSE_OVERLAY_BTN_ID = "close-overlay-btn";
 	
 	private static  ArrayList<Widget> overlayContents = new ArrayList<Widget>();
 	
-	public static void setContainer(String oPanelName)
+	public static void setOverlayElements(String overlayElementId, String closeBtnId){
+		setContainer(overlayElementId);
+		setCloseOverlayButtonId(closeBtnId);
+	}
+	
+	private static void setContainer(String oPanelName)
 	{
 		overlayBody.getElement().setId("overlayContainer");
 		overlayBody.getElement().setClassName("content");
@@ -24,6 +33,10 @@ public class OverlayAssembler extends PageAssembler{
 		overlayPanelName = oPanelName;
 
 		RootPanel.get(overlayPanelName).add(overlayBody);
+	}
+	
+	private static void setCloseOverlayButtonId(String id){
+		CLOSE_OVERLAY_BTN_ID = id;
 	}
 	
 	public static void ready(Widget obj)

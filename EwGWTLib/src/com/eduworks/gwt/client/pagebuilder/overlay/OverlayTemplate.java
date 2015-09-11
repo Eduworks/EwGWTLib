@@ -6,8 +6,9 @@ import com.eduworks.gwt.client.pagebuilder.screen.ScreenTemplate;
 import com.google.gwt.user.client.Event;
 
 public abstract class OverlayTemplate extends ScreenTemplate{
-	public void display(){
-		PageAssembler.attachHandler("close-overlay-btn", Event.ONCLICK, new EventCallback() {
+	
+	public void setupCloseButton(){
+		PageAssembler.attachHandler(OverlayAssembler.CLOSE_OVERLAY_BTN_ID, Event.ONCLICK, new EventCallback() {
 			@Override
 			public void onEvent(Event event) {
 				cleanAndCloseOverlay(event);
