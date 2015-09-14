@@ -26,7 +26,7 @@ public class ScreenDispatch {
 	private final int historyLimit = 30;
 	private ScreenTemplate defaultScreen;
 	
-	protected void loadScreen(ScreenTemplate st, boolean storeHistory) {
+	public void loadScreen(ScreenTemplate st, boolean storeHistory) {
 		if (st!=null) {
 			if (history.size()!=0&&storeHistory)
 				history.lastElement().screen.lostFocus();
