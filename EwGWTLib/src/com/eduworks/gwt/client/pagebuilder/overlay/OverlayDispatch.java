@@ -15,13 +15,13 @@ public class OverlayDispatch extends ScreenDispatch {
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
 				String historyToken = event.getValue();
-				
+
 				if(historyToken.contains("Overlay")){
 					OverlayAssembler.showOverlay();
 				}else{
-					OverlayAssembler.hideOverlay();
+					if(!History.getToken().contains("Overlay"))
+						OverlayAssembler.hideOverlay();
 				}
-				
 			}
 		});
 	}

@@ -12,10 +12,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class OverlayAssembler {
+public class OverlayAssembler extends PageAssembler {
 	protected static FlowPanel overlayBody = new FlowPanel();
 	
-	protected static String overlayPanelName;
+	protected static String overlayPanelName = "contentOverlay";
 	protected static String CLOSE_OVERLAY_BTN_ID = "close-overlay-btn";
 	
 	private static  ArrayList<Widget> overlayContents = new ArrayList<Widget>();
@@ -25,7 +25,7 @@ public class OverlayAssembler {
 		setCloseOverlayButtonId(closeBtnId);
 	}
 	
-	private static void setContainer(String oPanelName)
+	public static void setContainer(String oPanelName)
 	{
 		overlayBody.getElement().setId("overlayContainer");
 		overlayBody.getElement().setClassName("content");
@@ -35,12 +35,13 @@ public class OverlayAssembler {
 		RootPanel.get(overlayPanelName).add(overlayBody);
 	}
 	
-	private static void setCloseOverlayButtonId(String id){
+	public static void setCloseOverlayButtonId(String id){
 		CLOSE_OVERLAY_BTN_ID = id;
 	}
 	
 	public static void ready(Widget obj)
 	{
+		DOM.getElementById(overlayPanelName).addClassName("active");
 		overlayContents.add(obj);
 	}
 	
