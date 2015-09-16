@@ -1,8 +1,13 @@
 package com.eduworks.gwt.client.pagebuilder.modal;
 
 import com.eduworks.gwt.client.component.HtmlTemplates;
+import com.eduworks.gwt.client.pagebuilder.overlay.OverlayDispatch;
+import com.eduworks.gwt.client.pagebuilder.screen.ScreenDispatch;
 
 public abstract class ModalTemplate {
+	
+	public abstract ScreenDispatch getScreenDispatcher();
+	public abstract OverlayDispatch getOverlayDispatcher();
 	public abstract ModalDispatch getModalDispatcher();
 	public abstract HtmlTemplates getTemplates();
 	
