@@ -54,12 +54,16 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
       return false;
    }
    
+   protected static String getInstallationSettingsLoc() {return DEFAULT_INSTALLATION_SETTINGS_LOC;}
+   
+   protected static String getModulePropertiesLoc() {return DEFAULT_MODULE_PROPERTIES_LOC;}
+   
    private static void fetchProperties(final ESBCallback<ESBPacket> callback) {
-      CommunicationHub.sendHTTP(CommunicationHub.GET, DEFAULT_INSTALLATION_SETTINGS_LOC, null, false, new ESBCallback<ESBPacket>() {
+      CommunicationHub.sendHTTP(CommunicationHub.GET, getInstallationSettingsLoc(), null, false, new ESBCallback<ESBPacket>() {
          @Override
          public void onSuccess(ESBPacket ESBPacket) {
             if (parseApplicationProperties(ESBPacket.getString(CONTENT_STREAM).split("\r\n|\r|\n"))) {
-               CommunicationHub.sendHTTP(CommunicationHub.GET, DEFAULT_MODULE_PROPERTIES_LOC, null, false, callback);
+               CommunicationHub.sendHTTP(CommunicationHub.GET, getModulePropertiesLoc(), null, false, callback);
             } 
             else {
                Window.alert("Invalid installation settings");
