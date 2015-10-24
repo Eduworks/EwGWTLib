@@ -1,5 +1,7 @@
 package com.eduworks.gwt.client.component;
 
+import java.util.logging.Logger;
+
 import com.eduworks.gwt.client.net.CommunicationHub;
 import com.eduworks.gwt.client.net.callback.ESBCallback;
 import com.eduworks.gwt.client.net.packet.ESBPacket;
@@ -10,8 +12,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.ClosingEvent;
-import com.google.gwt.user.client.Window.ClosingHandler;
 
 public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHandler<String> {
 
@@ -54,11 +54,13 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
       return false;
    }
    
-   protected static String getInstallationSettingsLoc() {return DEFAULT_INSTALLATION_SETTINGS_LOC;}
+   protected String getInstallationSettingsLoc() {return DEFAULT_INSTALLATION_SETTINGS_LOC;}
    
-   protected static String getModulePropertiesLoc() {return DEFAULT_MODULE_PROPERTIES_LOC;}
+   protected String getModulePropertiesLoc() {return DEFAULT_MODULE_PROPERTIES_LOC;}
    
-   private static void fetchProperties(final ESBCallback<ESBPacket> callback) {
+   private void fetchProperties(final ESBCallback<ESBPacket> callback) {
+	  final Class cls = this.getClass();
+	   
       CommunicationHub.sendHTTP(CommunicationHub.GET, getInstallationSettingsLoc(), null, false, new ESBCallback<ESBPacket>() {
          @Override
          public void onSuccess(ESBPacket ESBPacket) {
@@ -71,7 +73,12 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
          }
          @Override
          public void onFailure(Throwable caught) {
-            Window.alert("Couldn't find network settings");
+        	if(!cls.getName().equals(AppEntry.class.getName())){
+        		Window.alert("Couldn't find network settings");
+        	}else{
+        		Logger l = Logger.getLogger("AppEntry");
+        		l.warning("Couldn't find Network Settings");
+        	}
          }
       });
    }
@@ -100,7 +107,12 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
       //add history change handler
       History.addValueChangeHandler(this);
 
-      //fetch properties and setup history state/screen
+      runFetchProperties();
+
+   }
+   
+   protected void runFetchProperties(){
+	 //fetch properties and setup history state/screen
       fetchProperties(new ESBCallback<ESBPacket>() {
          @Override
          public void onSuccess(ESBPacket ESBPacket) {
@@ -114,7 +126,6 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
             Window.alert("Couldn't find build number");
          }
       });
-
    }
 
 }
