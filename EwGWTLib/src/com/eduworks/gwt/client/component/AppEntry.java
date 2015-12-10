@@ -58,6 +58,8 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
    
    protected String getModulePropertiesLoc() {return DEFAULT_MODULE_PROPERTIES_LOC;}
    
+   protected void parseAppSpecificProperties(String[] rawProperties){}
+   
    private void fetchProperties(final ESBCallback<ESBPacket> callback) {
 	  final Class cls = this.getClass();
 	   
@@ -65,6 +67,7 @@ public class AppEntry extends AppSettings implements EntryPoint, ValueChangeHand
          @Override
          public void onSuccess(ESBPacket ESBPacket) {
             if (parseApplicationProperties(ESBPacket.getString(CONTENT_STREAM).split("\r\n|\r|\n"))) {
+               parseAppSpecificProperties(ESBPacket.getString(CONTENT_STREAM).split("\r\n|\r|\n"));
                CommunicationHub.sendHTTP(CommunicationHub.GET, getModulePropertiesLoc(), null, false, callback);
             } 
             else {

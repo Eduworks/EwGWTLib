@@ -17,6 +17,6 @@ public class AppSettings {
    public static ScreenTemplate defaultScreen;
    
    public static String siteName = "";
-   public static String helpURL = ""; 
+   public static String helpURL = "";
 
 }
